@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A.M. Abd El Shafi</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --navy:#0a2240;
+  --blue:#1565c0;
+  --sky:#29b6f6;
+  --cyan:#00bcd4;
+  --green:#00897b;
+  --orange:#f57c00;
+  --red:#c62828;
+  --amber:#ff8f00;
+  --bg:#f0f4f8;
+  --card:#fff;
+  --text:#0d1b2a;
+  --muted:#607d8b;
+  --border:#dde6ee;
+}
+
+body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:var(--text)}
+
+/* ── Role Selector ── */
+.role-screen{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:linear-gradient(160deg,#0a2240 0%,#1565c0 60%,#0288d1 100%);
+  padding:24px;gap:32px;
+}
+.role-screen h1{color:#fff;font-size:26px;font-weight:900;text-align:center}
+.role-screen p{color:rgba(255,255,255,.65);font-size:14px;text-align:center;margin-top:-20px}
+.role-cards{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;max-width:600px}
+.role-card{
+  background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);
+  border-radius:20px;padding:28px 36px;cursor:pointer;text-align:center;
+  color:#fff;transition:all .2s;min-width:160px;
+}
+.role-card:hover{background:rgba(255,255,255,.22);transform:translateY(-4px);border-color:rgba(255,255,255,.5)}
+.role-card .icon{font-size:42px;margin-bottom:10px}
+.role-card .name{font-size:16px;font-weight:700}
+.role-card .desc{font-size:12px;opacity:.7;margin-top:4px}
+
+/* ── App Shell ── */
+.app{display:none;flex-direction:column;min-height:100vh}
+.app.active{display:flex}
+
+/* Top Bar */
+.topbar{
+  background:var(--navy);color:#fff;
+  padding:14px 20px;display:flex;align-items:center;
+  justify-content:space-between;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 12px rgba(0,0,0,.3);
+}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar .role-badge{
+  background:rgba(255,255,255,.15);border-radius:8px;
+  padding:4px 10px;font-size:12px;font-weight:600;
+}
+.topbar h2{font-size:16px;font-weight:700}
+.btn-back{
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  color:#fff;cursor:pointer;font-family:'Cairo',sans-serif;
+  font-size:13px;font-weight:600;padding:7px 14px;border-radius:8px;
+}
+
+/* Content */
+.content{flex:1;padding:20px;max-width:700px;margin:0 auto;width:100%}
+
+/* Cards */
+.card{background:var(--card);border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid var(--border)}
+.card-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+/* Form */
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;border:2px solid var(--border);border-radius:10px;
+  padding:11px 14px;font-family:'Cairo',sans-serif;font-size:15px;
+  color:var(--text);outline:none;transition:border-color .2s;
+  background:#fafcff;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--sky)}
+.form-group textarea{resize:vertical;min-height:80px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* Buttons */
+.btn{
+  width:100%;border:none;cursor:pointer;font-family:'Cairo',sans-serif;
+  font-size:15px;font-weight:700;padding:13px;border-radius:12px;
+  transition:all .2s;
+}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;box-shadow:0 4px 16px rgba(21,101,192,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(21,101,192,.4)}
+.btn-success{background:linear-gradient(135deg,var(--green),#26a69a);color:#fff;box-shadow:0 4px 16px rgba(0,137,123,.3)}
+.btn-danger{background:linear-gradient(135deg,var(--red),#e53935);color:#fff}
+.btn-sm{width:auto;padding:8px 18px;font-size:13px}
+
+/* Fault Cards */
+.fault-card{
+  background:var(--card);border-radius:14px;padding:16px;
+  border:2px solid var(--border);margin-bottom:12px;
+  transition:border-color .2s;
+}
+.fault-card.pending{border-color:#ffd54f}
+.fault-card.accepted{border-color:var(--sky)}
+.fault-card.inprogress{border-color:var(--cyan)}
+.fault-card.done{border-color:var(--green)}
+
+.fault-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.fault-id{font-size:12px;font-weight:700;color:var(--muted)}
+.status-badge{
+  border-radius:20px;padding:3px 12px;font-size:12px;font-weight:700;
+}
+.badge-pending{background:#fff8e1;color:#f57c00}
+.badge-accepted{background:#e3f2fd;color:var(--blue)}
+.badge-inprogress{background:#e0f7fa;color:#00838f}
+.badge-done{background:#e8f5e9;color:#2e7d32}
+
+.fault-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.fault-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.meta-item{
+  background:var(--bg);border-radius:8px;padding:4px 10px;
+  font-size:12px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:4px;
+}
+
+/* Timer */
+.timer-display{
+  background:var(--navy);color:#fff;border-radius:12px;
+  padding:14px;text-align:center;margin:12px 0;
+}
+.timer-display .timer-label{font-size:12px;opacity:.7;margin-bottom:4px}
+.timer-display .timer-val{font-size:32px;font-weight:900;font-family:'Courier New',monospace;color:#39ff14;letter-spacing:2px}
+
+.fault-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+/* Notification */
+.notif-panel{position:fixed;top:70px;left:50%;transform:translateX(-50%);
+  z-index:999;display:flex;flex-direction:column;gap:8px;min-width:300px;max-width:400px;pointer-events:none}
+.notif{
+  background:#fff;border-radius:12px;padding:14px 18px;
+  box-shadow:0 8px 32px rgba(0,0,0,.18);border-right:4px solid var(--green);
+  animation:slideIn .3s ease;pointer-events:all;display:flex;align-items:flex-start;gap:12px;
+}
+.notif.warn{border-right-color:var(--amber)}
+.notif-icon{font-size:22px;flex-shrink:0}
+.notif-body .notif-title{font-size:14px;font-weight:700;color:var(--navy)}
+.notif-body .notif-msg{font-size:12px;color:var(--muted);margin-top:2px}
+@keyframes slideIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+
+/* Engineer view */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.stat-box{background:var(--card);border-radius:14px;padding:16px;text-align:center;border:1px solid var(--border)}
+.stat-num{font-size:28px;font-weight:900;color:var(--navy)}
+.stat-lbl{font-size:12px;color:var(--muted);font-weight:600}
+
+/* Empty */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty .e-icon{font-size:48px;margin-bottom:12px}
+.empty p{font-size:14px}
+
+.divider{height:2px;background:linear-gradient(90deg,var(--sky),var(--cyan),transparent);border-radius:2px;margin:20px 0}
+
+/* ── Completion Modal ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(10,34,64,.55);backdrop-filter:blur(4px);
+  z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.modal-box{
+  background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:480px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);animation:modalIn .25s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+.modal-title{font-size:18px;font-weight:900;color:var(--navy);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+.modal-actions .btn{flex:1}
+
+/* ── Filter Tabs ── */
+.filter-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.filter-tab{
+  flex:1;min-width:90px;border:2px solid var(--border);background:var(--card);
+  border-radius:12px;padding:10px 8px;cursor:pointer;text-align:center;
+  font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;color:var(--muted);
+  transition:all .2s;
+}
+.filter-tab:hover{border-color:var(--sky);color:var(--blue)}
+.filter-tab.active{background:var(--navy);border-color:var(--navy);color:#fff}
+
+/* ── Project Selector ── */
+.project-screen{
+  min-height:100vh;display:none;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:linear-gradient(160deg,#0a2240 0%,#1565c0 60%,#0288d1 100%);
+  padding:24px;gap:28px;
+}
+.project-screen.active{display:flex}
+.project-screen h1{color:#fff;font-size:24px;font-weight:900;text-align:center}
+.project-screen p{color:rgba(255,255,255,.65);font-size:14px;text-align:center;margin-top:-16px}
+.project-cards{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;max-width:600px}
+.project-card{
+  background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);
+  border-radius:20px;padding:26px 32px;cursor:pointer;text-align:center;
+  color:#fff;transition:all .2s;min-width:150px;
+}
+.project-card:hover{background:rgba(255,255,255,.22);transform:translateY(-4px);border-color:rgba(255,255,255,.5)}
+.project-card .icon{font-size:38px;margin-bottom:10px}
+.project-card .name{font-size:16px;font-weight:700}
+.btn-back-role{
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);
+  color:#fff;cursor:pointer;font-family:'Cairo',sans-serif;
+  font-size:13px;font-weight:600;padding:9px 20px;border-radius:10px;
+}
+.project-badge{
+  background:rgba(255,255,255,.18);border-radius:8px;
+  padding:4px 10px;font-size:12px;font-weight:600;
+}
+.filter-tab .tab-num{font-size:22px;font-weight:900;display:block;line-height:1.2}
+
+/* ── Search Bar ── */
+.search-wrap{position:relative;margin-bottom:16px}
+.search-wrap input{
+  width:100%;border:2px solid var(--border);border-radius:12px;
+  padding:12px 44px 12px 14px;font-family:'Cairo',sans-serif;font-size:15px;
+  color:var(--text);outline:none;transition:border-color .2s;background:#fafcff;
+}
+.search-wrap input:focus{border-color:var(--sky)}
+.search-wrap .search-icon{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  font-size:18px;pointer-events:none;
+}
+.search-wrap .clear-btn{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);
+  display:none;
+}
+
+/* Analysis display in card */
+.analysis-box{
+  background:linear-gradient(135deg,#e8f5e9,#f1f8e9);
+  border:1.5px solid #a5d6a7;border-radius:12px;
+  padding:12px 14px;margin-top:10px;
+}
+.analysis-box .a-title{font-size:12px;font-weight:700;color:#2e7d32;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.analysis-box .a-comment{font-size:13px;color:#1b5e20;line-height:1.6;margin-bottom:8px}
+.analysis-box .a-analysis{font-size:13px;color:#33691e;line-height:1.6;background:rgba(255,255,255,.6);border-radius:8px;padding:8px 10px}
+.analysis-box .a-analysis-label{font-size:11px;font-weight:700;color:#558b2f;margin-bottom:3px}
+
+/* Photo attachment */
+.photo-input-wrap{border:2px dashed var(--border);border-radius:12px;padding:14px;text-align:center;background:#fafcff}
+.photo-input-wrap input[type=file]{font-family:'Cairo',sans-serif;font-size:13px;width:100%}
+.photo-preview-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.photo-thumb{position:relative;width:72px;height:72px}
+.photo-thumb img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:2px solid var(--border)}
+.photo-thumb .rm-btn{
+  position:absolute;top:-6px;left:-6px;background:var(--red);color:#fff;border:none;
+  width:20px;height:20px;border-radius:50%;font-size:12px;cursor:pointer;line-height:1;
+}
+.tech-photos-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.tech-photos-row a img{width:74px;height:74px;object-fit:cover;border-radius:10px;border:2px solid #a5d6a7}
+
+/* GPS link */
+.gps-link{
+  background:#e3f2fd;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;
+  color:var(--blue);display:inline-flex;align-items:center;gap:4px;text-decoration:none;
+}
+.gps-link:hover{background:#bbdefb}
+
+/* Technician name badge (topbar) */
+.tech-name-badge{background:rgba(255,255,255,.15);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600}
+
+/* Technician stats pills (engineer view) */
+.tech-stats-row{display:flex;gap:10px;flex-wrap:wrap}
+.tech-pill{
+  border:2px solid var(--border);border-radius:14px;padding:10px 16px;cursor:pointer;
+  text-align:center;min-width:110px;background:#fafcff;transition:all .2s;
+}
+.tech-pill:hover{border-color:var(--sky)}
+.tech-pill.active{background:var(--navy);border-color:var(--navy)}
+.tech-pill .tp-name{font-size:13px;font-weight:700;color:var(--navy)}
+.tech-pill.active .tp-name{color:#fff}
+.tech-pill .tp-counts{font-size:11px;color:var(--muted);margin-top:4px}
+.tech-pill.active .tp-counts{color:rgba(255,255,255,.75)}
+
+/* Technician name entry screen */
+.tech-name-box{background:rgba(255,255,255,.1);border-radius:18px;padding:26px;max-width:320px;width:100%}
+.tech-name-box input{
+  width:100%;padding:12px 14px;border-radius:10px;border:none;
+  font-family:'Cairo',sans-serif;font-size:15px;margin-bottom:14px;outline:none;
+}
+</style>
+</head>
+<body>
+
+<!-- Role Selector -->
+<div class="role-screen" id="roleScreen">
+  <h1>🔧 A.M. Abd El Shafi</h1>
+  <p>اختر دورك للدخول</p>
+  <div class="role-cards">
+    <div class="role-card" onclick="selectRole('supervisor')">
+      <div class="icon">👷</div>
+      <div class="name">خدمة عملاء</div>
+      <div class="desc">إرسال البلاغات</div>
+    </div>
+    <div class="role-card" onclick="selectRole('technician')">
+      <div class="icon">🔨</div>
+      <div class="name">الفني</div>
+      <div class="desc">قبول ومعالجة الأعطال</div>
+    </div>
+    <div class="role-card" onclick="selectRole('engineer')">
+      <div class="icon">📊</div>
+      <div class="name">المهندس</div>
+      <div class="desc">متابعة جميع البلاغات</div>
+    </div>
+  </div>
+</div>
+
+<!-- Project Selector -->
+<div class="project-screen" id="projectScreen">
+  <h1 id="projectScreenTitle">🏘️ اختر المشروع</h1>
+  <p>هيظهرلك بلاغات هذا المشروع فقط</p>
+  <div class="project-cards">
+    <div class="project-card" onclick="selectProject('gardenia')">
+      <div class="icon">🌿</div>
+      <div class="name">جاردينيا</div>
+    </div>
+    <div class="project-card" onclick="selectProject('taj')">
+      <div class="icon">👑</div>
+      <div class="name">تاج</div>
+    </div>
+    <div class="project-card" onclick="selectProject('elkeyan')">
+      <div class="icon">🏛️</div>
+      <div class="name">الكيان</div>
+    </div>
+    <div class="project-card" onclick="selectProject('westelshorouk')">
+      <div class="icon">🏙️</div>
+      <div class="name">غرب الشروق</div>
+    </div>
+  </div>
+  <button class="btn-back-role" onclick="backToRoleScreen()">⬅ رجوع لاختيار الدور</button>
+</div>
+
+<!-- Technician Name Entry -->
+<div class="project-screen" id="techNameScreen">
+  <h1>🔨 مين الفني الداخل؟</h1>
+  <p>اكتب اسمك عشان المهندس يقدر يعرف مكانك وأعمالك</p>
+  <div class="tech-name-box">
+    <input type="text" id="techNameInput" placeholder="اكتب اسمك بالكامل">
+    <button class="btn btn-primary" onclick="confirmTechName()">دخول ✅</button>
+  </div>
+  <button class="btn-back-role" onclick="backToProjectFromTechName()">⬅ رجوع</button>
+</div>
+
+<!-- Notification Panel (shared) -->
+<div class="notif-panel" id="notifPanel"></div>
+
+<!-- ══════════════ SUPERVISOR APP ══════════════ -->
+<div class="app" id="app-supervisor">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="role-badge">👷 خدمة عملاء</span>
+      <span class="project-badge" id="sup-project-badge"></span>
+      <h2>إرسال بلاغ عطل</h2>
+    </div>
+    <button class="btn btn-back btn-sm" onclick="goBack()">تغيير الدور</button>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div class="card-title">📋 بيانات العطل</div>
+      <div class="row2">
+        <div class="form-group">
+          <label>رقم العداد</label>
+          <input type="text" id="s-meter" placeholder="مثال: WM-2048">
+        </div>
+        <div class="form-group">
+          <label>رقم العمارة</label>
+          <input type="text" id="s-building" placeholder="مثال: B12">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="form-group">
+          <label>رقم الشقة</label>
+          <input type="text" id="s-flat" placeholder="مثال: 305">
+        </div>
+        <div class="form-group">
+          <label>نوع العطل</label>
+          <select id="s-type">
+            <option value="">-- اختر --</option>
+            <option>العداد اوفلاين</option>
+            <option>انقطاع المياه</option>
+            <option>ضعف ضغط المياه</option>
+            <option>أخري</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>اسم المُبلّغ</label>
+        <input type="text" id="s-name" placeholder="اسمك">
+      </div>
+      <div class="form-group">
+        <label>وصف إضافي</label>
+        <textarea id="s-desc" placeholder="اشرح المشكلة بالتفصيل..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="submitFault()">📤 إرسال البلاغ</button>
+    </div>
+
+    <div class="divider"></div>
+    <div class="card-title" style="padding:0 4px 12px">📬 بلاغاتي</div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs" id="sup-filter-tabs">
+      <div class="filter-tab active" data-filter="all" onclick="setSupFilter('all')">
+        <span class="tab-num" id="sup-count-all">0</span>الكل
+      </div>
+      <div class="filter-tab" data-filter="pending" onclick="setSupFilter('pending')" style="border-color:#ffd54f">
+        <span class="tab-num" style="color:var(--orange)" id="sup-count-pending">0</span>بانتظار القبول
+      </div>
+      <div class="filter-tab" data-filter="inprogress" onclick="setSupFilter('inprogress')" style="border-color:var(--cyan)">
+        <span class="tab-num" style="color:var(--cyan)" id="sup-count-inprogress">0</span>قيد التنفيذ
+      </div>
+      <div class="filter-tab" data-filter="done" onclick="setSupFilter('done')" style="border-color:var(--green)">
+        <span class="tab-num" style="color:var(--green)" id="sup-count-done">0</span>منتهية
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="sup-search" placeholder="ابحث برقم العداد أو العمارة أو الشقة..." oninput="onSupSearch(this)">
+      <button class="clear-btn" id="sup-search-clear" onclick="clearSupSearch()">✕</button>
+    </div>
+
+    <div id="s-my-faults"></div>
+  </div>
+</div>
+
+<!-- ══════════════ TECHNICIAN APP ══════════════ -->
+<div class="app" id="app-technician">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="role-badge">🔨 الفني</span>
+      <span class="project-badge" id="tech-project-badge"></span>
+      <span class="tech-name-badge" id="tech-name-badge"></span>
+      <h2>قائمة الأعطال</h2>
+    </div>
+    <button class="btn btn-back btn-sm" onclick="goBack()">تغيير الدور</button>
+  </div>
+  <div class="content">
+    <!-- Filter Tabs -->
+    <div class="filter-tabs" id="tech-filter-tabs">
+      <div class="filter-tab active" data-filter="all" onclick="setTechFilter('all')">
+        <span class="tab-num" id="tech-count-all">0</span>الكل
+      </div>
+      <div class="filter-tab" data-filter="pending" onclick="setTechFilter('pending')" style="border-color:#ffd54f">
+        <span class="tab-num" style="color:var(--orange)" id="tech-count-pending">0</span>بانتظار القبول
+      </div>
+      <div class="filter-tab" data-filter="inprogress" onclick="setTechFilter('inprogress')" style="border-color:var(--cyan)">
+        <span class="tab-num" style="color:var(--cyan)" id="tech-count-inprogress">0</span>قيد التنفيذ
+      </div>
+      <div class="filter-tab" data-filter="done" onclick="setTechFilter('done')" style="border-color:var(--green)">
+        <span class="tab-num" style="color:var(--green)" id="tech-count-done">0</span>منتهية
+      </div>
+    </div>
+    <!-- Search -->
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="tech-search" placeholder="ابحث برقم العداد أو العمارة أو الشقة..." oninput="onTechSearch(this)">
+      <button class="clear-btn" id="tech-search-clear" onclick="clearTechSearch()">✕</button>
+    </div>
+    <div id="t-faults-list"></div>
+  </div>
+</div>
+
+<!-- ══════════════ ENGINEER APP ══════════════ -->
+<div class="app" id="app-engineer">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="role-badge">📊 المهندس</span>
+      <span class="project-badge" id="eng-project-badge"></span>
+      <h2>لوحة المتابعة</h2>
+    </div>
+    <button class="btn btn-back btn-sm" onclick="goBack()">تغيير الدور</button>
+  </div>
+  <div class="content">
+    <!-- Filter Tabs -->
+    <div class="filter-tabs" id="eng-filter-tabs">
+      <div class="filter-tab active" data-filter="all" onclick="setEngFilter('all')">
+        <span class="tab-num" id="eng-count-all">0</span>الكل
+      </div>
+      <div class="filter-tab" data-filter="pending" onclick="setEngFilter('pending')" style="border-color:#ffd54f">
+        <span class="tab-num" style="color:var(--orange)" id="eng-count-pending">0</span>بانتظار القبول
+      </div>
+      <div class="filter-tab" data-filter="inprogress" onclick="setEngFilter('inprogress')" style="border-color:var(--cyan)">
+        <span class="tab-num" style="color:var(--cyan)" id="eng-count-inprogress">0</span>قيد التنفيذ
+      </div>
+      <div class="filter-tab" data-filter="done" onclick="setEngFilter('done')" style="border-color:var(--green)">
+        <span class="tab-num" style="color:var(--green)" id="eng-count-done">0</span>منتهية
+      </div>
+    </div>
+    <!-- Search -->
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="eng-search" placeholder="ابحث برقم العداد أو العمارة أو الشقة..." oninput="onEngSearch(this)">
+      <button class="clear-btn" id="eng-search-clear" onclick="clearEngSearch()">✕</button>
+    </div>
+    <div class="card" id="eng-tech-stats-card">
+      <div class="card-title">🧑‍🔧 الفنيين — عدد الأعطال المحلولة</div>
+      <div class="tech-stats-row" id="eng-tech-stats-list"></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="card-title" style="padding:0 4px 12px">📋 البلاغات</div>
+    <div id="e-all-faults"></div>
+  </div>
+</div>
+
+<!-- ══════════════ COMPLETION MODAL ══════════════ -->
+<div class="modal-overlay" id="completionModal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title">🏁 إنهاء البلاغ</div>
+    <div class="modal-sub" id="modal-fault-label">أدخل تعليقك وتحليلك للمشكلة قبل الإغلاق</div>
+
+    <div class="form-group">
+      <label>💬 تعليق الفني</label>
+      <textarea id="modal-comment" placeholder="اكتب ملاحظاتك على العطل وما تم عمله..." style="min-height:90px"></textarea>
+    </div>
+    <div class="form-group">
+      <label>🔍 تحليل المشكلة</label>
+      <textarea id="modal-analysis" placeholder="ما سبب العطل؟ هل هو متكرر؟ ما التوصيات للمستقبل؟" style="min-height:90px"></textarea>
+    </div>
+    <div class="form-group">
+      <label>📷 صورة بعد حل المشكلة (اختياري)</label>
+      <div class="photo-input-wrap">
+        <input type="file" id="modal-photo" accept="image/*" capture="environment" multiple onchange="handlePhotoSelect(event)">
+        <div class="photo-preview-row" id="modal-photo-preview"></div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-success" onclick="confirmComplete()">✅ تأكيد الإنهاء</button>
+      <button class="btn" style="background:#eceff1;color:var(--navy);flex:0.5" onclick="closeModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══ State ══ */
+let currentRole = null;
+let currentProject = null; // 'gardenia' | 'taj' | 'elkeyan' | 'westelshorouk'
+let pendingRole = null; // role chosen, waiting for project pick
+let faults = JSON.parse(localStorage.getItem('wm_faults') || '[]');
+let timers = {}; // fault.id -> setInterval handle
+let pendingCompleteId = null; // fault waiting for technician comment
+let currentTechName = null; // name of technician currently logged in
+let pendingPhotos = []; // photos (base64) staged in completion modal
+let engTechFilter = 'all'; // engineer view: filter faults by technician name
+
+const PROJECTS = {
+  gardenia:       { name: 'جاردينيا',      icon: '🌿' },
+  taj:            { name: 'تاج',            icon: '👑' },
+  elkeyan:        { name: 'الكيان',         icon: '🏛️' },
+  westelshorouk:  { name: 'غرب الشروق',     icon: '🏙️' },
+};
+
+function save() { localStorage.setItem('wm_faults', JSON.stringify(faults)); }
+
+/* ══ Completion Modal ══ */
+function openCompleteModal(id) {
+  const f = faults.find(x => x.id === id);
+  if (!f) return;
+  pendingCompleteId = id;
+  pendingPhotos = [];
+  document.getElementById('modal-fault-label').textContent = `البلاغ ${f.id} — ${f.type}`;
+  document.getElementById('modal-comment').value = '';
+  document.getElementById('modal-analysis').value = '';
+  document.getElementById('modal-photo').value = '';
+  document.getElementById('modal-photo-preview').innerHTML = '';
+  document.getElementById('completionModal').style.display = 'flex';
+}
+
+function closeModal() {
+  pendingCompleteId = null;
+  pendingPhotos = [];
+  document.getElementById('completionModal').style.display = 'none';
+}
+
+function confirmComplete() {
+  const comment  = document.getElementById('modal-comment').value.trim();
+  const analysis = document.getElementById('modal-analysis').value.trim();
+  if (!comment || !analysis) {
+    notify('⚠️ يرجى ملء التعليق والتحليل', '', 'warn'); return;
+  }
+  completeFault(pendingCompleteId, comment, analysis, pendingPhotos.slice());
+  closeModal();
+}
+
+/* ══ Photo Attachment (technician completion) ══ */
+function handlePhotoSelect(event) {
+  const files = Array.from(event.target.files || []);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      pendingPhotos.push(e.target.result);
+      renderPhotoPreview();
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = ''; // allow re-selecting same file
+}
+
+function renderPhotoPreview() {
+  const wrap = document.getElementById('modal-photo-preview');
+  wrap.innerHTML = pendingPhotos.map((p, i) => `
+    <div class="photo-thumb">
+      <img src="${p}">
+      <button type="button" class="rm-btn" onclick="removePendingPhoto(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removePendingPhoto(i) {
+  pendingPhotos.splice(i, 1);
+  renderPhotoPreview();
+}
+
+/* ══ Role & Project Navigation ══ */
+function selectRole(role) {
+  pendingRole = role;
+  document.getElementById('roleScreen').style.display = 'none';
+  document.getElementById('projectScreen').classList.add('active');
+}
+
+function backToRoleScreen() {
+  pendingRole = null;
+  document.getElementById('projectScreen').classList.remove('active');
+  document.getElementById('roleScreen').style.display = 'flex';
+}
+
+function selectProject(project) {
+  currentProject = project;
+
+  // Technicians must identify themselves before entering the app
+  if (pendingRole === 'technician') {
+    document.getElementById('projectScreen').classList.remove('active');
+    document.getElementById('techNameScreen').classList.add('active');
+    document.getElementById('techNameInput').value = localStorage.getItem('wm_tech_name') || '';
+    return;
+  }
+
+  currentRole = pendingRole;
+  document.getElementById('projectScreen').classList.remove('active');
+  document.querySelectorAll('.app').forEach(a => a.classList.remove('active'));
+  document.getElementById('app-' + currentRole).classList.add('active');
+
+  const p = PROJECTS[currentProject];
+  const badgeId = { supervisor: 'sup-project-badge', technician: 'tech-project-badge', engineer: 'eng-project-badge' }[currentRole];
+  const badgeEl = document.getElementById(badgeId);
+  if (badgeEl) badgeEl.textContent = `${p.icon} ${p.name}`;
+
+  render();
+  startAllTimers();
+}
+
+function backToProjectFromTechName() {
+  document.getElementById('techNameScreen').classList.remove('active');
+  document.getElementById('projectScreen').classList.add('active');
+}
+
+function confirmTechName() {
+  const name = document.getElementById('techNameInput').value.trim();
+  if (!name) { notify('⚠️ يرجى كتابة اسمك أولاً', '', 'warn'); return; }
+  currentTechName = name;
+  localStorage.setItem('wm_tech_name', name);
+  currentRole = 'technician';
+
+  document.getElementById('techNameScreen').classList.remove('active');
+  document.querySelectorAll('.app').forEach(a => a.classList.remove('active'));
+  document.getElementById('app-technician').classList.add('active');
+
+  const p = PROJECTS[currentProject];
+  document.getElementById('tech-project-badge').textContent = `${p.icon} ${p.name}`;
+  document.getElementById('tech-name-badge').textContent = `👨‍🔧 ${currentTechName}`;
+
+  render();
+  startAllTimers();
+}
+
+function goBack() {
+  stopAllTimers();
+  currentRole = null;
+  currentProject = null;
+  pendingRole = null;
+  currentTechName = null;
+  document.querySelectorAll('.app').forEach(a => a.classList.remove('active'));
+  document.getElementById('projectScreen').classList.remove('active');
+  document.getElementById('techNameScreen').classList.remove('active');
+  document.getElementById('roleScreen').style.display = 'flex';
+}
+
+/* ══ Submit Fault (Supervisor) ══ */
+function submitFault() {
+  const meter    = v('s-meter').trim();
+  const building = v('s-building').trim();
+  const flat     = v('s-flat').trim();
+  const type     = v('s-type');
+  const name     = v('s-name').trim();
+  const desc     = v('s-desc').trim();
+
+  if (!meter || !building || !flat || !type || !name) {
+    notify('⚠️ يرجى ملء جميع الحقول المطلوبة', '', 'warn'); return;
+  }
+
+  const fault = {
+    id: 'BLG-' + Date.now().toString().slice(-6),
+    project: currentProject,
+    meter, building, flat, type, name, desc,
+    status: 'pending', // pending → accepted → inprogress → done
+    createdAt: Date.now(),
+    acceptedAt: null,
+    startedAt: null,
+    doneAt: null,
+    elapsed: 0,
+    techComment: null,
+    techAnalysis: null,
+    techName: null,
+    techLocation: null,
+    techPhotos: null,
+  };
+
+  faults.unshift(fault);
+  save();
+
+  // Clear form
+  ['s-meter','s-building','s-flat','s-name','s-desc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('s-type').value = '';
+
+  pushNotifToTech(fault);
+  notify('✅ تم إرسال البلاغ بنجاح', `رقم البلاغ: ${fault.id}`, 'ok');
+  render();
+}
+
+/* ══ Technician Actions ══ */
+function acceptFault(id) {
+  const f = faults.find(x => x.id === id);
+  if (!f) return;
+  f.status = 'accepted';
+  f.acceptedAt = Date.now();
+  f.techName = currentTechName;
+  save(); render();
+  notify('✅ تم قبول البلاغ', `${f.id} — ${f.type}`, 'ok');
+  updateTechLocation(id, true);
+}
+
+function startFault(id) {
+  const f = faults.find(x => x.id === id);
+  if (!f) return;
+  f.status = 'inprogress';
+  f.startedAt = Date.now();
+  f.elapsed = 0;
+  f.techName = f.techName || currentTechName;
+  save(); render();
+  startTimer(id);
+  notify('⏱️ بدأ العمل على البلاغ', `${f.id} — العداد: ${f.meter}`, 'ok');
+  updateTechLocation(id, true);
+}
+
+function completeFault(id, comment, analysis, photos) {
+  const f = faults.find(x => x.id === id);
+  if (!f) return;
+  stopTimer(id);
+  f.elapsed += (Date.now() - f.startedAt);
+  f.status = 'done';
+  f.doneAt = Date.now();
+  f.techComment  = comment;
+  f.techAnalysis = analysis;
+  if (photos && photos.length) f.techPhotos = photos;
+  save(); render();
+  notify('🎉 تم إنهاء البلاغ', `${f.id} — المدة: ${formatMs(f.elapsed)}`, 'ok');
+  updateTechLocation(id, true);
+}
+
+/* ══ GPS Location ══ */
+function updateTechLocation(id, silent) {
+  if (!('geolocation' in navigator)) {
+    if (!silent) notify('⚠️ الجهاز لا يدعم تحديد الموقع', '', 'warn');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const f = faults.find(x => x.id === id);
+      if (!f) return;
+      f.techLocation = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        ts: Date.now(),
+      };
+      save(); render();
+      if (!silent) notify('📍 تم تحديث موقعك', `${f.id}`, 'ok');
+    },
+    err => {
+      if (!silent) notify('⚠️ تعذر الوصول لموقعك', 'تأكد من تفعيل صلاحية الموقع', 'warn');
+    },
+    { enableHighAccuracy: true, timeout: 8000 }
+  );
+}
+
+/* ══ Timers ══ */
+function startTimer(id) {
+  if (timers[id]) return;
+  timers[id] = setInterval(() => {
+    updateTimerDisplay(id);
+  }, 1000);
+}
+
+function stopTimer(id) {
+  if (timers[id]) { clearInterval(timers[id]); delete timers[id]; }
+}
+
+function startAllTimers() {
+  faults.filter(f => f.status === 'inprogress').forEach(f => startTimer(f.id));
+}
+
+function stopAllTimers() {
+  Object.keys(timers).forEach(id => clearInterval(timers[id]));
+  timers = {};
+}
+
+function updateTimerDisplay(id) {
+  const f = faults.find(x => x.id === id);
+  if (!f || f.status !== 'inprogress') return;
+  const elapsed = f.elapsed + (Date.now() - f.startedAt);
+  const el = document.getElementById('timer-' + id);
+  if (el) el.textContent = formatMs(elapsed);
+}
+
+function formatMs(ms) {
+  const s = Math.floor(ms / 1000);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return `${pad(h)}:${pad(m)}:${pad(sec)}`;
+}
+function pad(n) { return String(n).padStart(2, '0'); }
+
+/* ══ Render ══ */
+function render() {
+  if (currentRole === 'supervisor') renderSupervisor();
+  if (currentRole === 'technician') renderTechnician();
+  if (currentRole === 'engineer')   renderEngineer();
+}
+
+/* ══ Filter & Search State ══ */
+let engFilter  = 'all';
+let techFilter = 'all';
+let supFilter  = 'all';
+let engSearch  = '';
+let techSearch = '';
+let supSearch  = '';
+
+function setSupFilter(f) {
+  supFilter = f;
+  document.querySelectorAll('#sup-filter-tabs .filter-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.filter === f);
+  });
+  renderSupervisor();
+}
+
+function onSupSearch(input) {
+  supSearch = input.value.trim().toLowerCase();
+  document.getElementById('sup-search-clear').style.display = supSearch ? 'block' : 'none';
+  renderSupervisor();
+}
+
+function clearSupSearch() {
+  supSearch = '';
+  document.getElementById('sup-search').value = '';
+  document.getElementById('sup-search-clear').style.display = 'none';
+  renderSupervisor();
+}
+
+function renderSupervisor() {
+  const projFaults = faults.filter(f => f.project === currentProject);
+
+  // Update tab counts
+  ['all','pending','inprogress','done'].forEach(s => {
+    const count = s === 'all' ? projFaults.length : projFaults.filter(f => f.status === s).length;
+    const el = document.getElementById('sup-count-' + s);
+    if (el) el.textContent = count;
+  });
+
+  const el = document.getElementById('s-my-faults');
+  let list = supFilter === 'all' ? projFaults : projFaults.filter(f => f.status === supFilter);
+  list = list.filter(f => matchesSearch(f, supSearch));
+
+  if (!projFaults.length) { el.innerHTML = emptyHTML('📭','لم ترسل أي بلاغات بعد'); return; }
+  if (!list.length)       { el.innerHTML = emptyHTML('🔎','لا توجد نتائج مطابقة'); return; }
+  el.innerHTML = list.map(f => faultCardHTML(f, 'supervisor')).join('');
+}
+
+function setEngFilter(f) {
+  engFilter = f;
+  document.querySelectorAll('#eng-filter-tabs .filter-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.filter === f);
+  });
+  renderEngineer();
+}
+
+function setTechFilter(f) {
+  techFilter = f;
+  document.querySelectorAll('#tech-filter-tabs .filter-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.filter === f);
+  });
+  renderTechnician();
+}
+
+function onEngSearch(input) {
+  engSearch = input.value.trim().toLowerCase();
+  document.getElementById('eng-search-clear').style.display = engSearch ? 'block' : 'none';
+  renderEngineer();
+}
+
+function clearEngSearch() {
+  engSearch = '';
+  document.getElementById('eng-search').value = '';
+  document.getElementById('eng-search-clear').style.display = 'none';
+  renderEngineer();
+}
+
+function onTechSearch(input) {
+  techSearch = input.value.trim().toLowerCase();
+  document.getElementById('tech-search-clear').style.display = techSearch ? 'block' : 'none';
+  renderTechnician();
+}
+
+function clearTechSearch() {
+  techSearch = '';
+  document.getElementById('tech-search').value = '';
+  document.getElementById('tech-search-clear').style.display = 'none';
+  renderTechnician();
+}
+
+function matchesSearch(f, q) {
+  if (!q) return true;
+  return f.meter.toLowerCase().includes(q) ||
+         f.building.toLowerCase().includes(q) ||
+         f.flat.toLowerCase().includes(q);
+}
+
+function renderTechnician() {
+  const projFaults = faults.filter(f => f.project === currentProject);
+
+  // Update tab counts
+  ['all','pending','inprogress','done'].forEach(s => {
+    const count = s === 'all' ? projFaults.length : projFaults.filter(f => f.status === s).length;
+    const el = document.getElementById('tech-count-' + s);
+    if (el) el.textContent = count;
+  });
+
+  const el = document.getElementById('t-faults-list');
+  let list = techFilter === 'all' ? projFaults : projFaults.filter(f => f.status === techFilter);
+  list = list.filter(f => matchesSearch(f, techSearch));
+
+  if (!projFaults.length) { el.innerHTML = emptyHTML('📭','لا توجد بلاغات في الوقت الحالي'); return; }
+  if (!list.length)       { el.innerHTML = emptyHTML('🔎','لا توجد نتائج مطابقة'); return; }
+  el.innerHTML = list.map(f => faultCardHTML(f, 'technician')).join('');
+}
+
+function renderEngineer() {
+  const projFaults = faults.filter(f => f.project === currentProject);
+  const pending    = projFaults.filter(f => f.status === 'pending').length;
+  const inprogress = projFaults.filter(f => f.status === 'inprogress').length;
+  const done       = projFaults.filter(f => f.status === 'done').length;
+
+  // Update tab counts
+  const countEls = {
+    'all': projFaults.length, pending, inprogress, done
+  };
+  Object.entries(countEls).forEach(([k, v]) => {
+    const el = document.getElementById('eng-count-' + k);
+    if (el) el.textContent = v;
+  });
+
+  renderEngTechStats(projFaults);
+
+  const el = document.getElementById('e-all-faults');
+  let list = engFilter === 'all' ? projFaults : projFaults.filter(f => f.status === engFilter);
+  if (engTechFilter !== 'all') list = list.filter(f => f.techName === engTechFilter);
+  list = list.filter(f => matchesSearch(f, engSearch));
+
+  if (!projFaults.length) { el.innerHTML = emptyHTML('📊','لا توجد بلاغات بعد'); return; }
+  if (!list.length)       { el.innerHTML = emptyHTML('🔎','لا توجد نتائج مطابقة'); return; }
+  el.innerHTML = list.map(f => faultCardHTML(f, 'engineer')).join('');
+}
+
+/* ══ Technician Stats (Engineer view) ══ */
+function renderEngTechStats(projFaults) {
+  const listEl = document.getElementById('eng-tech-stats-list');
+  if (!listEl) return;
+
+  const names = [...new Set(projFaults.filter(f => f.techName).map(f => f.techName))];
+
+  if (!names.length) {
+    listEl.innerHTML = `<div class="empty" style="padding:16px"><div class="e-icon">🧑‍🔧</div><p>لا يوجد فنيون معرّفون بعد</p></div>`;
+    return;
+  }
+
+  const stats = names.map(name => {
+    const assigned = projFaults.filter(f => f.techName === name);
+    const doneCount = assigned.filter(f => f.status === 'done').length;
+    return { name, total: assigned.length, done: doneCount };
+  });
+  stats.sort((a, b) => b.done - a.done);
+
+  let html = `
+    <div class="tech-pill ${engTechFilter === 'all' ? 'active' : ''}" onclick="setEngTechFilter('all')">
+      <div class="tp-name">👥 كل الفنيين</div>
+      <div class="tp-counts">${projFaults.length} بلاغ</div>
+    </div>`;
+  html += stats.map(s => `
+    <div class="tech-pill ${engTechFilter === s.name ? 'active' : ''}" onclick="setEngTechFilter('${s.name}')">
+      <div class="tp-name">👨‍🔧 ${s.name}</div>
+      <div class="tp-counts">✅ ${s.done} منتهي / ${s.total} إجمالي</div>
+    </div>`).join('');
+
+  listEl.innerHTML = html;
+}
+
+function setEngTechFilter(name) {
+  engTechFilter = name;
+  renderEngineer();
+}
+
+function faultCardHTML(f, role) {
+  const statusMap = {
+    pending:    {label:'بانتظار القبول', cls:'badge-pending',   cardCls:'pending'},
+    accepted:   {label:'تم القبول',      cls:'badge-accepted',  cardCls:'accepted'},
+    inprogress: {label:'قيد التنفيذ',    cls:'badge-inprogress',cardCls:'inprogress'},
+    done:       {label:'منتهي',          cls:'badge-done',      cardCls:'done'},
+  };
+  const s = statusMap[f.status] || statusMap.pending;
+
+  let timerHTML = '';
+  if (f.status === 'inprogress') {
+    const elapsed = f.elapsed + (Date.now() - f.startedAt);
+    timerHTML = `
+      <div class="timer-display">
+        <div class="timer-label">⏱️ مدة التنفيذ</div>
+        <div class="timer-val" id="timer-${f.id}">${formatMs(elapsed)}</div>
+      </div>`;
+  }
+  if (f.status === 'done') {
+    timerHTML = `
+      <div class="timer-display" style="background:var(--green)">
+        <div class="timer-label">✅ وقت الإنجاز</div>
+        <div class="timer-val">${formatMs(f.elapsed)}</div>
+      </div>`;
+  }
+
+  let actionsHTML = '';
+  if (role === 'technician') {
+    if (f.status === 'pending')
+      actionsHTML = `<button class="btn btn-primary btn-sm" onclick="acceptFault('${f.id}')">✅ قبول البلاغ</button>`;
+    else if (f.status === 'accepted') {
+      actionsHTML = `<button class="btn btn-success btn-sm" onclick="startFault('${f.id}')">▶️ بدء العمل</button>`;
+      actionsHTML += `<button class="btn btn-sm" style="background:#e3f2fd;color:var(--blue)" onclick="updateTechLocation('${f.id}')">📍 تحديث موقعي</button>`;
+    } else if (f.status === 'inprogress') {
+      actionsHTML = `<button class="btn btn-danger btn-sm" onclick="openCompleteModal('${f.id}')">🏁 إنهاء العطل</button>`;
+      actionsHTML += `<button class="btn btn-sm" style="background:#e3f2fd;color:var(--blue)" onclick="updateTechLocation('${f.id}')">📍 تحديث موقعي</button>`;
+    }
+  }
+
+  const createdTime = new Date(f.createdAt).toLocaleString('ar-EG');
+
+  const gpsHTML = f.techLocation
+    ? `<a class="gps-link" target="_blank" href="https://www.google.com/maps?q=${f.techLocation.lat},${f.techLocation.lng}">📍 موقع الفني على الخريطة — آخر تحديث ${new Date(f.techLocation.ts).toLocaleTimeString('ar-EG')}</a>`
+    : '';
+
+  const photosHTML = (f.techPhotos && f.techPhotos.length)
+    ? `<div class="tech-photos-row">${f.techPhotos.map(p => `<a href="${p}" target="_blank"><img src="${p}"></a>`).join('')}</div>`
+    : '';
+
+  return `
+    <div class="fault-card ${s.cardCls}">
+      <div class="fault-header">
+        <div>
+          <div class="fault-id">${f.id} — ${createdTime}</div>
+          <div class="fault-title">🔧 ${f.type}</div>
+        </div>
+        <span class="status-badge ${s.cls}">${s.label}</span>
+      </div>
+      <div class="fault-meta">
+        <span class="meta-item">${PROJECTS[f.project] ? PROJECTS[f.project].icon : '🏘️'} ${PROJECTS[f.project] ? PROJECTS[f.project].name : ''}</span>
+        <span class="meta-item">💧 عداد: ${f.meter}</span>
+        <span class="meta-item">🏢 عمارة: ${f.building}</span>
+        <span class="meta-item">🚪 شقة: ${f.flat}</span>
+        <span class="meta-item">👤 ${f.name}</span>
+        ${f.techName ? `<span class="meta-item">👨‍🔧 الفني: ${f.techName}</span>` : ''}
+      </div>
+      ${gpsHTML ? `<div style="margin-bottom:10px">${gpsHTML}</div>` : ''}
+      ${f.desc ? `<div style="font-size:13px;color:var(--muted);margin-bottom:10px;padding:8px;background:#f5f8fb;border-radius:8px">${f.desc}</div>` : ''}
+      ${timerHTML}
+      ${f.status === 'done' && f.techComment ? `
+        <div class="analysis-box">
+          <div class="a-title">📝 تقرير الفني</div>
+          <div class="a-comment">${f.techComment}</div>
+          ${f.techAnalysis ? `<div class="a-analysis"><div class="a-analysis-label">🔍 تحليل المشكلة</div>${f.techAnalysis}</div>` : ''}
+          ${photosHTML}
+        </div>` : ''}
+      ${actionsHTML ? `<div class="fault-actions">${actionsHTML}</div>` : ''}
+    </div>`;
+}
+
+function emptyHTML(icon, msg) {
+  return `<div class="empty"><div class="e-icon">${icon}</div><p>${msg}</p></div>`;
+}
+
+/* ══ Notifications ══ */
+function notify(title, msg, type = 'ok') {
+  const panel = document.getElementById('notifPanel');
+  const n = document.createElement('div');
+  n.className = 'notif' + (type === 'warn' ? ' warn' : '');
+  n.innerHTML = `
+    <div class="notif-icon">${type === 'warn' ? '⚠️' : '✅'}</div>
+    <div class="notif-body">
+      <div class="notif-title">${title}</div>
+      ${msg ? `<div class="notif-msg">${msg}</div>` : ''}
+    </div>`;
+  panel.appendChild(n);
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('🔧 ' + title, { body: msg });
+  }
+  setTimeout(() => { n.style.opacity = '0'; n.style.transition = 'opacity .4s'; setTimeout(() => n.remove(), 400); }, 4500);
+}
+
+/* ══ Cross-device push notification via localStorage ══ */
+function pushNotifToTech(fault) {
+  const pending = JSON.parse(localStorage.getItem('wm_tech_notifs') || '[]');
+  pending.push({ id: fault.id, project: fault.project, type: fault.type, building: fault.building, flat: fault.flat, ts: Date.now() });
+  localStorage.setItem('wm_tech_notifs', JSON.stringify(pending));
+}
+
+let seenNotifTs = Date.now();
+function checkTechNotifs() {
+  if (currentRole !== 'technician') return;
+  const pending = JSON.parse(localStorage.getItem('wm_tech_notifs') || '[]');
+  const fresh = pending.filter(n => n.ts > seenNotifTs && n.project === currentProject);
+  fresh.forEach(n => {
+    const p = PROJECTS[n.project];
+    notify('📬 بلاغ جديد وصل!', `${p ? p.icon + ' ' + p.name : ''} | نوع: ${n.type} | عمارة ${n.building} - شقة ${n.flat}`);
+  });
+  // advance seen timestamp past all notifs (not just this project's) to avoid re-checking old ones repeatedly
+  if (pending.length) seenNotifTs = Math.max(seenNotifTs, ...pending.map(n => n.ts));
+}
+
+if ('Notification' in window && Notification.permission === 'default') {
+  Notification.requestPermission();
+}
+
+/* ══ Helpers ══ */
+function v(id) { return document.getElementById(id).value; }
+
+/* ══ Live refresh for timers ── */
+setInterval(() => {
+  if (currentRole === 'technician') {
+    faults.filter(f => f.status === 'inprogress').forEach(f => updateTimerDisplay(f.id));
+  }
+  if (currentRole === 'engineer') {
+    faults.filter(f => f.status === 'inprogress').forEach(f => updateTimerDisplay(f.id));
+    renderEngineer(); // refresh stats
+  }
+  // Check for new fault notifications sent to technician
+  checkTechNotifs();
+  // Reload from storage to pick up changes from other tabs
+  const fresh = JSON.parse(localStorage.getItem('wm_faults') || '[]');
+  if (JSON.stringify(fresh) !== JSON.stringify(faults)) {
+    const inprogBefore = faults.filter(f => f.status === 'inprogress').map(f => f.id);
+    faults = fresh;
+    // notify if new faults appeared for technician
+    if (currentRole === 'technician') {
+      fresh.filter(f => f.status === 'pending').forEach(f => {
+        if (!inprogBefore.includes(f.id)) {} // could do new-fault notif
+      });
+    }
+    // notify engineer if a fault just became done
+    if (currentRole === 'engineer') {
+      fresh.filter(f => f.status === 'done').forEach(f => {
+        if (!document.getElementById('timer-done-' + f.id)) {
+          // already rendered
+        }
+      });
+    }
+    render();
+    startAllTimers();
+  }
+}, 2000);
+</script>
+</body>
+</html>
